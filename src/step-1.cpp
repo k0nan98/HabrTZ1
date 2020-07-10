@@ -24,10 +24,11 @@ void charChanger(string _patch) {
 	if (fs.is_open()) {
 		while (!fs.eof()) {
 			if (fs.get() == '\r') {
-				fs.seekp((fs.tellp() - static_cast<std::streampos>(1)));
+				fs.seekp((fs.tellp() - static_cast<std::streampos>(3)));
 				fs.put('\n');
 				fs.seekp(fs.tellp());
 			}
+
 		}
 		fs.close();
 	}
@@ -36,7 +37,7 @@ void charChanger(string _patch) {
 		std::cout << "Faild to open" << '\n';
 	}
 }
-string parseSensorFile(string line, tm fileT, string patch) { //patch = path to work directory
+string parseSensorFile(string line, tm fileT) { 
 
 	try {
 		
@@ -47,9 +48,7 @@ string parseSensorFile(string line, tm fileT, string patch) { //patch = path to 
 			sscanf(str.c_str(), "%4d-%2d-%2d %2d:%2d:%2d.%3d -> %4d-%2d-%2d %2d:%2d:%2d.%3d -> %*2c-%*2d-%*1c; %*5d-%*2d:%*1d:%f:%*1d", &tm1.tm_year, &tm1.tm_mon, &tm1.tm_mday,
 				&tm1.tm_hour, &tm1.tm_min, &tm1.tm_sec, &afterdot, &tm2.tm_year, &tm2.tm_mon, &tm2.tm_mday,
 				&tm2.tm_hour, &tm2.tm_min, &tm2.tm_sec, &afterdot2, &e);
-			return to_string(tm2.tm_year) + "-" + to_string(tm2.tm_mon) + "-" + to_string(tm2.tm_mday) + " " + to_string(tm2.tm_hour) + ":" + to_string(tm2.tm_min) + ":" + to_string(tm2.tm_sec) +"," +to_string(e);
-			//cout << tm1.tm_year << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
-		
+			return to_string(tm2.tm_year) + "-" + to_string(tm2.tm_mon) + "-" + to_string(tm2.tm_mday) + " " + to_string(tm2.tm_hour) + ":" + to_string(tm2.tm_min) + ":" + to_string(tm2.tm_sec) +"," +to_string(e);		
 
 	}
 	catch (exception e) {
@@ -88,6 +87,7 @@ string parse(string line, tm fileT, string time, string dir) { //dir = path to w
 				return fres;
 
 			}
+
 			//cout << tm1.tm_year << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
 		
 	}
@@ -110,12 +110,9 @@ void readFile(string _patch, tm fileT, string fileTime, string workDir) {
 	ifstream file2(workDir + fileTime + " sensor data.log"); // файл из которого читаем (для линукс путь будет выглядеть по другому)
 	charChanger(workDir + fileTime + " sensor data.log");
 	while (getline(file, s) && getline(file2, s2)) { // пока не достигнут конец файла класть очередную строку в переменную (s)
-		
-		cout << s << endl; // выводим на экран
-
 		string a = parse(s, fileT, fileTime, workDir);
 		if (a.length() > 1) {
-			myfile << a << "," << parseSensorFile(s2, fileT, workDir) << "\n";
+			myfile << a << "," << parseSensorFile(s2, fileT) << "\n";
 		}
 		myfile.flush();
 
